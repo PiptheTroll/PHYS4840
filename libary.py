@@ -3,7 +3,7 @@ import sys
 import math
 import matplotlib.pyplot as plt
 
-def y(x):
+def funct_y(x):
  	y = 2.0*x**3.0
  	return y
 
@@ -47,6 +47,8 @@ def cookies(max):
 	which_cookie = cookie_type[spare_change.argmin()]
 	print('The single type of cookie that minimizes change is: ', which_cookie)
 
-
+def gaussian(x, A, B, C, D, E):
+#A,B,C,D,E are the changeable paramaters, use an array for the x values.
+	return A + (B * x) + (C * (np.exp(-(x - D)**2 / (2 * E**2))))
 
 
