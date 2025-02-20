@@ -139,9 +139,9 @@ romb_time, romb_result = timing_function(romberg, x_data, y_data, max_order)
 true_value = 0.26424111765711535680895245967707826510837773793646433098432639660507700851
 
 # Compute errors
-trap_error = np.abs(trapezoidal(y_data, x_data, N) - true_value)
-simp_error = np.abs(simpsons(y_data, x_data, N) - true_value)
-romb_error = np.abs(romberg(y_data, x_data, max_order) - true_value)
+trap_error = np.abs(trap_result - true_value)
+simp_error = np.abs(simp_result - true_value)
+romb_error = np.abs(romb_result - true_value)
 
 # Print results with error analysis
 print("\nIntegration Method Comparison")
@@ -161,17 +161,21 @@ trap_errors = []
 simp_errors = []
 romb_errors = []
 
-Num = np.arange(1, 15)
-
+Num = np.arange(1, 15, 1)
 
 for n in Num:
-	trap_times.append(timing_function(trapezoidal, x_data, y_data, n)[0])
-	simp_times.append(timing_function(simpsons, x_data, y_data, n)[0])
-	romb_times.append(timing_function(romberg, x_data, y_data, n)[0])
 
-	trap_errors.append(np.abs(trapezoidal(y_data, x_data, n) - true_value))
-	simp_errors.append(np.abs(simpsons(y_data, x_data, n) - true_value))
-	romb_errors.append(np.abs(romberg(y_data, x_data, n) - true_value))
+    trap_tm, trap_rs = timing_function(trapezoidal, x_data, y_data, n)
+    simp_tm, simp_rs = timing_function(simpsons, x_data, y_data, n)
+    romb_tm, romb_rs = timing_function(romberg, x_data, y_data, n)
+
+    trap_times.append(trap_tm)
+    simp_times.append(simp_tm)
+    romb_times.append(romb_tm)
+
+    trap_errors.append(np.abs(trap_rs - true_value))
+    simp_errors.append(np.abs(simp_rs - true_value))
+    romb_errors.append(np.abs(romb_rs - true_value))
 
 trap_times = np.array(trap_times)
 simp_times = np.array(simp_times)
@@ -180,13 +184,23 @@ trap_errors = np.array(trap_errors)
 simp_errors = np.array(simp_errors)
 romb_errors = np.array(romb_errors)
 
-fig, ax = plt.subplots(2)
+print(trap_times)
+print(trap_errors)
 
-ax[0].plot(Num, trap_errors, color ='black')
-ax[0].plot(Num, simp_errors, color ='blue')
-ax[0].plot(Num, romb_errors, color = 'green')
-ax[1].plot(np.log10(trap_times), trap_errors, color ='black')
-ax[1].plot(np.log10(simp_times), simp_errors, color ='blue')
-ax[1].plot(np.log10(romb_times), romb_errors, color = 'green')
+fig, ax = plt.subplots(1, 2)
+
+ax[0].scatter(Num, trap_errors, color ='black', label = 'trapezoidal', s=2)
+ax[0].scatter(Num, simp_errors, color ='blue', label = 'simpson', s=2)
+ax[0].scatter(Num, romb_errors, color = 'green', label = 'romdberg', s=2)
+ax[0].set_xlabel('N value')
+ax[0].set_ylabel('Absolute Error')
+ax[1].scatter((trap_times), trap_errors, color ='black', s=2)
+ax[1].scatter((simp_times), simp_errors, color ='blue', s=2)
+ax[1].scatter((romb_times), romb_errors, color = 'green', s=2)
+ax[1].set_xlabel('Time of operation (sec)')
+ax[1].set_ylabel('Absolute Value')
+ax[1].set_xscale('log')
+fig.suptitle('Efficiency of Numerical Integration Methods')
+fig.legend()
 
 plt.show()
