@@ -16,3 +16,11 @@ def format_axes(ax):
 def distance_mod(p):
 ##calculates the distance modulus (m - M) with p in parsecs 
 	return 5 * np.log10(p/10)
+
+def f1(x):
+## 1 + tanh(2x)/2 function used starting in lab_day10
+    return 1 + np.tanh(2 * x) / 2
+
+def f2(x):
+## derivative of the f1 functions as a function
+    return 1 / (np.exp**(2 * x) + np.exp**(-2 * x) + 2)
