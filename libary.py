@@ -19,8 +19,8 @@ def distance_mod(p):
 
 def f1(x):
 ## 1 + tanh(2x)/2 function used starting in lab_day10
-    return 1 + np.tanh(2 * x) / 2
+    return 1 + (np.tanh(2 * x) / 2)
 
 def f2(x):
 ## derivative of the f1 functions as a function
-    return 1 / (np.exp**(2 * x) + np.exp**(-2 * x) + 2)
+    return 1 / np.cosh(2 * x)**2
