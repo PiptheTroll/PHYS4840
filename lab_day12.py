@@ -145,4 +145,11 @@ def qr_decomposition(A):
 
     return Q, R
 
+Q, R = qr_decomposition(A)
+
+QT = Q.transpose()
+
 print(qr_decomposition(A))
+print(np.dot(Q, R))
+print(np.dot(Q,  QT))
+
