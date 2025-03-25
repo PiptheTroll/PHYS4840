@@ -17,10 +17,40 @@ def distance_mod(p):
 ##calculates the distance modulus (m - M) with p in parsecs 
 	return 5 * np.log10(p/10)
 
-def f1(x):
+def f1(x, t):
 ## 1 + tanh(2x)/2 function used starting in lab_day10
     return 1 + (np.tanh(2 * x) / 2)
 
-def f2(x):
+def f2(x, t):
 ## derivative of the f1 functions as a function
     return 1 / np.cosh(2 * x)**2
+
+def f3(x, t):
+    return x**2 - x
+
+def f4(x, t):
+    return -x**3 + np.sin(t)
+
+def euler_method(f, x0, t0, t_end, dt):
+#solves a FO ODE f, with initial values x0 at time t0, up until the time t_end, with step sizes (h) of size dt
+    t_values = np.arange(t0, t_end + dt, dt)
+    x_values = np.zeros(len(t_values))
+    x_values[0] = x0
+#sets the initial value of the x_values to the x0 initial value
+
+    for i in range(1, len(t_values)):
+        x_values[i] = x_values[i - 1] + dt * f(x_values[i], t_values[i])
+
+    return t_values, x_values
+
+def RK(f, x0, t0, t_end, dt):
+#Runge-Kutta method for ODE DEQ solving
+    t_values = np.arange(t0, t_end + dt, dt)
+    x_values = np.zeros(len(t_values))
+    x_values[0] = x0
+#sets the initial value of the x_values to the x0 initial value
+
+    for i in range(1, len(t_values)):
+        x_values[i] = x_values[i - 1] + dt * f(x_values[i - 1] + .5 * (dt * f(x_values[i -1], t_values[i - 1])), t_values[i - 1] + .5 * dt)
+
+    return t_values, x_values
