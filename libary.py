@@ -54,3 +54,23 @@ def RK(f, x0, t0, t_end, dt):
         x_values[i] = x_values[i - 1] + dt * f(x_values[i - 1] + .5 * (dt * f(x_values[i - 1], t_values[i - 1])), t_values[i - 1] + .5 * dt)
 
     return t_values, x_values
+
+def RK4(f, x0, t0, t_end, dt):
+#Runge-Kutta method for ODE DEQ solving to the fourth order
+    t_values = np.arange(t0, t_end + dt, dt)
+    x_values = np.zeros(len(t_values))
+    x_values[0] = x0
+#sets the initial value of the x_values to the x0 initial value
+    def k1(x, t, f, dt):
+        return dt * f(x, t)
+    def k2(x, t, f, dt):
+        return dt * f(x + k1(x, t, f, dt) / 2, t + dt / 2)
+    def k3(x, t, f, dt):
+        return dt * f(x + k2(x, t, f, dt) / 2, t + dt / 2)
+    def k4(x, t, f, dt):
+        return dt * f(x + k3(x, t, f, dt), t + dt)
+
+    for i in range(1, len(t_values)):
+        x_values[i] = x_values[i - 1] + (k1(x_values[i - 1], t_values[i - 1], f, dt) + k2(x_values[i - 1], t_values[i - 1], f, dt) + k3(x_values[i - 1], t_values[i - 1], f, dt) + k4(x_values[i - 1], t_values[i - 1], f, dt)) / 6
+
+    return t_values, x_values
