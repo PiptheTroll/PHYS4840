@@ -33,10 +33,10 @@ n = 10000
 dt = 1 ## try two other step sizes
 
 # Solve using Euler method
-t_values10, x_values10 = lb.RK(lb.f4, x0, t0, t_end, 10 * dt)
-t_values20, x_values20 = lb.RK(lb.f4, x0, t0, t_end, 20 * dt)
-t_values50, x_values50 = lb.RK(lb.f4, x0, t0, t_end, 50 * dt)
-t_values100, x_values100 = lb.RK(lb.f4, x0, t0, t_end, 100 * dt)
+t_values10, x_values10 = lb.RK(lb.f4, x0, t0, t_end, (t_end - t0) / 10)
+t_values20, x_values20 = lb.RK(lb.f4, x0, t0, t_end, (t_end - t0) / 20)
+t_values50, x_values50 = lb.RK(lb.f4, x0, t0, t_end, (t_end - t0) / 50)
+t_values100, x_values100 = lb.RK(lb.f4, x0, t0, t_end, (t_end - t0) / 100)
 
 plt.figure(figsize=(8, 5))
 plt.plot(t_values10, x_values10, label="N = 10", color="b")
