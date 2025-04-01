@@ -39,7 +39,7 @@ def euler_method(f, x0, t0, t_end, dt):
 #sets the initial value of the x_values to the x0 initial value
 
     for i in range(1, len(t_values)):
-        x_values[i] = x_values[i - 1] + dt * f(x_values[i], t_values[i])
+        x_values[i] = x_values[i - 1] + dt * f(x_values[i - 1], t_values[i - 1])
 
     return t_values, x_values
 
@@ -51,6 +51,6 @@ def RK(f, x0, t0, t_end, dt):
 #sets the initial value of the x_values to the x0 initial value
 
     for i in range(1, len(t_values)):
-        x_values[i] = x_values[i - 1] + dt * f(x_values[i - 1] + .5 * (dt * f(x_values[i -1], t_values[i - 1])), t_values[i - 1] + .5 * dt)
+        x_values[i] = x_values[i - 1] + dt * f(x_values[i - 1] + .5 * (dt * f(x_values[i - 1], t_values[i - 1])), t_values[i - 1] + .5 * dt)
 
     return t_values, x_values
