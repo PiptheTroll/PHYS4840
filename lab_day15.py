@@ -3,6 +3,8 @@ import matplotlib.pyplot as plt
 import sys
 sys.path.append('/d/users/iank/PHYS4840_labs/')
 import libary as lb
+import time
+import subprocess
 
 ##which gfortran returns GNU Fortran (GCC) 11.4.1 20231218 (Red Hat 11.4.1-3)
 
@@ -69,4 +71,30 @@ plt.title("RK4 Method Solution from fortran n is int")
 plt.grid(True)
 plt.legend()
 plt.show()
+
+###-------Q4 Bonus-------###
+
+time0 = time.perf_counter()
+
+t1_vals, x1vals = lb.RK(lb.f4, x0, t0, t_end, (t_end - t0) / 10000)
+
+time1 = time.perf_counter()
+
+result = subprocess.run(['./rk2_results.exe'], capture_output=True, text=True)
+
+time2 = time.perf_counter()
+
+t3_vals, x3_vals = lb.RK4(lb.f4, x0, t0, t_end, (t_end - t0) / 10000)
+
+time3 = time.perf_counter()
+
+result = subprocess.run(['./rk4_results.exe'], capture_output=True, text=True)
+
+time4 = time.perf_counter()
+
+print('In python RungeKutta 2nd Order takes ', time1 - time0, ' seconds')
+print('In Fortran RungeKutta 2nd Order takes ', time2 - time1, ' seconds')
+
+print('In python RungeKutta 4th Order takes ', time3 - time2, ' seconds')
+print('In Fortran RungeKutta 4th Order takes ', time4 - time3, ' seconds')
 
