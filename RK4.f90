@@ -1,4 +1,4 @@
-program RungeKutta2
+program RungeKutta4
     implicit none
     real(8) :: t, x, dt, k1, k2, k3, k4, d0, t_end
     integer :: n, i
@@ -10,14 +10,14 @@ program RungeKutta2
     t_end = 10.0d0 ! Final time
     
     ! Number of time steps
-    n = 10000
+    n = 100
 
     ! Open a file to store results
     open(unit=10, file="rk4_results.dat", status="replace")
     write(10,*) "t x"
     write(10,*) t, x
     
-    ! RK2 integration loop
+    ! RK4 integration loop
     do i = 1, n
         k1 = dt * (-x**3 + sin(t))
         k2 = dt * (-(x + 0.5d0*k1)**3 + sin(t + 0.5d0*dt))
@@ -34,6 +34,6 @@ program RungeKutta2
     ! Close file
     close(10)
     
-    print *, "Integration complete. Results saved to rk2_results.dat"
+    print *, "Integration complete. Results saved to rk4_results.dat"
     
-end program RungeKutta2
+end program RungeKutta4
