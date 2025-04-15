@@ -146,8 +146,6 @@ def compute_bn(func, n, period=2*np.pi, num_points=1000):
     # Scale by 2/period for the Fourier coefficient
     return (2/period) * result
 
-
-
 def compute_coefficients(func, n_terms, period=2*np.pi, num_points=1000):
     """
     Compute all Fourier coefficients up to a specified number of terms.
@@ -194,9 +192,6 @@ def fourier_series_approximation(x, a0, an, bn, period=2*np.pi):
     
     return result
 
-
-
-
 #typically we dont need this function but its good for visualising
 def compute_partial_approximations(x, a0, an, bn, period=2*np.pi):
     """
@@ -226,3 +221,198 @@ def compute_partial_approximations(x, a0, an, bn, period=2*np.pi):
 
     
     return approximations, times
+
+def dft(x):
+    """
+    Compute the Discrete Fourier Transform (DFT) of the input signal.
+    
+    Parameters:
+        x (array): Input signal (time domain)
+    
+    Returns:
+        array: Fourier Transform of x (frequency domain, complex values)
+    """
+    time1 = time.perf_counter()
+    N = len(x)
+    X = np.zeros(N, dtype=complex)
+    
+    for k in range(N):
+        for n in range(N):
+            X[k] += x[n] * np.exp(-2j * np.pi * k * n / N)
+    time2 = time.perf_counter()
+    Time = time2 - time1
+    return X, Time
+
+def idft(X):
+    """
+    Compute the Inverse Discrete Fourier Transform (IDFT) of the input spectrum.
+    
+    Parameters:
+        X (array): Input spectrum (frequency domain)
+    
+    Returns:
+        array: Inverse Fourier Transform of X (time domain)
+    """
+    N = len(X)
+    x = np.zeros(N, dtype=complex)
+    
+    for n in range(N):
+        for k in range(N):
+            x[n] += X[k] * np.exp(2j * np.pi * k * n / N)
+    
+    # Normalize by N
+    x = x / N
+    
+    return x
+
+def fft_bluestein(x):
+    time1 = time.perf_counter()
+    N = len(x)
+    M = 2**int(np.ceil(np.log2(2*N - 1)))  # Next power of 2 >= 2N - 1
+    a = np.array(x, dtype=complex)
+
+    # Chirp signal
+    n = np.arange(N)
+    chirp = np.exp(1j * np.pi * (n**2) / N)
+    
+    a_chirp = a * chirp
+    b = np.zeros(M, dtype=complex)
+    b[:N] = np.exp(-1j * np.pi * (n**2) / N)
+    b[-(N-1):] = np.exp(-1j * np.pi * (n[1:][::-1]**2) / N)
+
+    A = np.fft.fft(a_chirp, n=M)
+    B = np.fft.fft(b, n=M)
+    C = A * B
+    c = np.fft.ifft(C)[:N]
+
+    f_inal = c * chirp
+    time2 = time.perf_counter()
+    Time = time2 - time1
+    return f_inal, Time
+
+def fft_zeropad(x):
+    time1 = time.perf_counter()
+    N = len(x)
+    next_pow2 = 1 << (N - 1).bit_length()
+    x_padded = np.pad(x, (0, next_pow2 - N), mode='constant')
+
+    f_inal = fft_ct(x_padded)
+    time2 = time.perf_counter()
+    Time = (time2 - time1)
+    return f_inal, Time
+
+def fft_ct(x):
+    """
+    Compute the Fast Fourier Transform (FFT) using the Cooley-Tukey algorithm.
+    This implementation works for signal lengths that are powers of 2.
+    
+    Parameters:
+        x (array): Input signal (time domain)
+    
+    Returns:
+        array: Fourier Transform of x (frequency domain)
+    """
+    time1 = time.perf_counter()
+    N = len(x)
+    
+    #print(x)
+    #print(N)
+
+    # Base case: FFT of a single point is the point itself
+    if N == 1:
+        return x
+    
+    # Check if N is a power of 2
+    if N & (N - 1) != 0:
+        raise ValueError("Signal length must be a power of 2")
+    
+    # Split even and odd indices
+    even = np.fft.fft(x[0::2])
+    odd = np.fft.fft(x[1::2])
+    
+    # Twiddle factors
+    twiddle = np.exp(-2j * np.pi * np.arange(N//2) / N)
+    
+    # Combine using butterfly pattern
+    result = np.zeros(N, dtype=complex)
+    half_N = N // 2
+    for k in range(half_N):
+        result[k] = even[k] + twiddle[k] * odd[k]
+        result[k + half_N] = even[k] - twiddle[k] * odd[k]
+    
+    time2 = time.perf_counter()
+
+    Time = (time2 - time1)
+
+    return result, Time
+
+def ifft(X):
+    """
+    Compute the Inverse Fast Fourier Transform (IFFT).
+    
+    Parameters:
+        X (array): Input spectrum (frequency domain)
+    
+    Returns:
+        array: Inverse Fourier Transform of X (time domain)
+    """
+    N = len(X)
+    
+    # Compute the FFT of the conjugate, then conjugate the result and scale
+    x = np.conj(np.fft.fft(np.conj(X))) / N
+    
+    return x
+
+
+def compress_audio_fft(audio, keep_ratio=0.1):
+    """
+    Compress audio by keeping only the top `keep_ratio` frequency components (by magnitude).
+    
+    Parameters:
+        audio (np.ndarray): Time-domain audio signal
+        keep_ratio (float): Fraction of strongest frequencies to keep (0 < keep_ratio <= 1)
+        
+    Returns:
+        compressed_audio (np.ndarray): Reconstructed audio from compressed frequency domain
+        X_compressed (np.ndarray): The compressed spectrum (mostly zero)
+    """
+    N = len(audio)
+    X = np.fft.fft(audio)
+    magnitudes = np.abs(X)
+    
+
+    # Determine how many frequencies to keep
+    new_N = N * keep_ratio 
+
+    # Get indices of top frequencies by magnitude
+    #can we assume its already sorted? np.argsort() might be useful here...
+    freqnew = np.argsort(X)
+    # Create a compressed version of the spectrum
+    x_compressed = freqnew[-N:]
+
+    # Inverse FFT to get time-domain signal
+    #remember we did all of this on the frequency domain, turn it back into a signal...
+    new_audio = ifft(x_compressed)
+
+    return new_audio
+
+def laplacian_operator(Phi, dx, dy, dz):
+    """
+    Compute the Laplacian of a scalar field Phi (i.e., apply the Poisson operator)
+    using central finite differences on a 3D uniform grid.
+
+    Parameters:
+    - Phi : 3D numpy array of shape (nx, ny, nz)
+    - dx, dy, dz : grid spacings in x, y, z directions
+
+    Returns:
+    - laplacian : 3D numpy array of the same shape as Phi
+    """
+
+    laplacian = (
+        (np.roll(Phi, -1, axis=0) - 2*Phi + np.roll(Phi, 1, axis=0)) / dx**2 +
+        (np.roll(Phi, -1, axis=1) - 2*Phi + np.roll(Phi, 1, axis=1)) / dy**2 +
+        (np.roll(Phi, -1, axis=2) - 2*Phi + np.roll(Phi, 1, axis=2)) / dz**2
+    )
+
+    return laplacian
