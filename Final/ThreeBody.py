@@ -2,7 +2,6 @@
 ###----------imports----------###
 
 import numpy as np
-import astropy
 import time
 import ThreeBody_lib as lib
 import matplotlib.pyplot as plt
