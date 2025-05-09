@@ -2,8 +2,6 @@ import numpy as np
 import astropy
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
-from PIL import Image
-import os
 
 def find_norm(vector):
 	norm = np.sqrt(np.sum(np.square(vector)))
