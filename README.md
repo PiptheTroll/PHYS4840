@@ -44,3 +44,5 @@ p_initial_1, p_initial_2, and p_initial_3 are the initial positions of the bodie
 
 v_initial_1, v_initial_2, and v_initial_3 are the initial velocities of the bodies. Represented as matrices of the x, y, and z components of the velocities. The velocities are in m/s units. It is recommended to start with velocities an order of magnitude less than the magnitude of the initial positions.
 
+Errors are sometimes expected. If an index error occurs around row 90 in the "ThreeBody.py" script, change the "safe_r" variable until you fin one that works for the situation.
+
