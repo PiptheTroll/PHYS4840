@@ -7,7 +7,6 @@ import time
 import ThreeBody_lib as lib
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
-import os
 
 ###---------------------------###
 animate = True
